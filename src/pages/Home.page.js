@@ -1,29 +1,64 @@
-import { Button } from '@mui/material'
-import { useContext } from 'react';
+import { useContext, useEffect, useState } from 'react';
+import request, { gql } from 'graphql-request';
+import PageContainer from "../components/PageContainer.component";
 import { UserContext } from '../contexts/user.context';
+import { GRAPHQL_ENDPOINT } from '../realm/constants';
+import ExpenseCard from '../components/ExpenseCard.component';
 
-export default function Home() {
-  const { logOutUser } = useContext(UserContext);
+const Home = () => {
+  // Fetching user details from UserContext
+  const { user } = useContext(UserContext);
 
-  // This function is called when the user clicks the "Logout" button.
-  const logOut = async () => {
-    try {
-      // Calling the logOutUser function from the user context.
-      const loggedOut = await logOutUser();
-      // Now we will refresh the page, and the user will be logged out and
-      // redirected to the login page because of the <PrivateRoute /> component.
-      if (loggedOut) {
-        window.location.reload(true);
-      }
-    } catch (error) {
-      alert(error)
+  const [expenses, setExpenses] = useState([]);
+
+  // GraphQL query to fetch all the expenses from the collection. 
+  const getAllExpensesQuery = gql`
+  query getAllExpenses {
+    expenses(sortBy: CREATEDAT_DESC) {
+      _id
+      title
+      amount
+      mode
+      category
+      createdAt
     }
   }
+  `;
 
-  return (
-    <>
-      <h1>Welcome to expengo</h1>
-      <Button variant="contained" onClick={logOut}>Logout</Button>
-    </>
-  )
+  // Since we don't want to filter the results as of now,
+  // we will just use the empty query object
+  const queryVariables = {};
+
+  // To prove that the identity of the user, we are attaching
+  // an Authorization Header with the request
+  const headers = { Authorization: `Bearer ${user._accessToken}` }
+
+  // loadExpenses function is responsible for making the GraphQL
+  // request to Realm and update the expenses array from the response. 
+  const loadExpenses = async () => {
+    const resp = await request(GRAPHQL_ENDPOINT,
+      getAllExpensesQuery,
+      queryVariables,
+      headers
+    );
+    setExpenses(_ => resp.expenses.map(expense => ({ ...expense, key: expense._id, afterDelete })));
+  };
+
+  useEffect(() => {
+    loadExpenses();
+  }, []);
+
+  // Helper function to be performed after an expense has been deleted.
+  const afterDelete = () => {
+    loadExpenses();
+  }
+
+  return <PageContainer>
+    <h1>All Expenses</h1>
+    {
+      expenses.map(expense => <ExpenseCard {...expense} />)
+    }
+  </PageContainer>
 }
+
+export default Home;
