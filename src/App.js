@@ -1,6 +1,7 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import NavBar from "./components/NavBar.component";
 import { UserProvider } from "./contexts/user.context";
+import Analytics from "./pages/Analytics.page";
 import CreateExpense from "./pages/CreateExpense.page";
 import EditExpense from "./pages/EditExpense.page";
 import Home from "./pages/Home.page";
@@ -24,6 +25,7 @@ function App() {
             <Route exact path="/" element={<Home />} />
             <Route exact path="/new" element={<CreateExpense />} />
             <Route exact path="/expense/:id/edit" element={<EditExpense />} />
+            <Route exact path="/analytics" element={<Analytics />} />
           </Route>
         </Routes>
       </UserProvider>
