@@ -1,15 +1,14 @@
-import { useContext, useEffect, useState } from 'react';
+import { useContext } from 'react';
 import request, { gql } from 'graphql-request';
 import PageContainer from "../components/PageContainer.component";
 import { UserContext } from '../contexts/user.context';
 import { GRAPHQL_ENDPOINT } from '../realm/constants';
 import ExpenseCard from '../components/ExpenseCard.component';
+import { useQuery } from 'react-query';
 
 const Home = () => {
   // Fetching user details from UserContext
   const { user } = useContext(UserContext);
-
-  const [expenses, setExpenses] = useState([]);
 
   // GraphQL query to fetch all the expenses from the collection. 
   const getAllExpensesQuery = gql`
@@ -35,28 +34,35 @@ const Home = () => {
 
   // loadExpenses function is responsible for making the GraphQL
   // request to Realm and update the expenses array from the response. 
-  const loadExpenses = async () => {
-    const resp = await request(GRAPHQL_ENDPOINT,
-      getAllExpensesQuery,
-      queryVariables,
-      headers
-    );
-    setExpenses(_ => resp.expenses.map(expense => ({ ...expense, key: expense._id, afterDelete })));
+  const loadExpenses = () => request(GRAPHQL_ENDPOINT,
+    getAllExpensesQuery,
+    queryVariables,
+    headers
+  );
+
+  // Now, instead of using useEffect, we are using useQuery.
+  // Also, we don't need to manage state separately. The data
+  // is already managed by the useQuery hook.
+  const { isLoading, error, data, refetch } = useQuery("allExpenses", loadExpenses);
+
+  // Helper function to be performed whenever an expense gets deleted.
+  // Here, instead of calling the loadExpenses function, we are calling
+  // the refetch function. This will trigger the loadExpenses function
+  // on our behalf, and will update the state automatically.
+  const afterDelete = () => {
+    refetch();
   };
 
-  useEffect(() => {
-    loadExpenses();
-  }, []);
+  if (isLoading) return "Loading";
 
-  // Helper function to be performed after an expense has been deleted.
-  const afterDelete = () => {
-    loadExpenses();
-  }
+  if (error) return error.message;
 
   return <PageContainer>
     <h1>All Expenses</h1>
     {
-      expenses.map(expense => <ExpenseCard {...expense} />)
+      data.expenses
+        .map(expense => ({ ...expense, key: expense._id, afterDelete }))
+        .map(expense => <ExpenseCard {...expense} />)
     }
   </PageContainer>
 }
