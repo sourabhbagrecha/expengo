@@ -14,10 +14,10 @@ const queryClient = new QueryClient();
 
 function App() {
   return (
+    // We are wrapping our whole app with UserProvider so that 
+    // our user is accessible through out the app from any page
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
-        {/* We are wrapping our whole app with UserProvider so that */}
-        {/* our user is accessible through out the app from any page*/}
         <UserProvider>
           <NavBar />
           <Routes>
