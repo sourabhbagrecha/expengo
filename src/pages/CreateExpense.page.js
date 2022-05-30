@@ -5,6 +5,7 @@ import { gql, request } from "graphql-request";
 import { GRAPHQL_ENDPOINT } from "../realm/constants";
 import ExpenseForm from "../components/ExpenseForm.component";
 import { useNavigate } from "react-router-dom";
+import useAuthedMutation from "../hooks/useAuthedMutation";
 
 const CreateExpense = () => {
   const { user } = useContext(UserContext);
@@ -12,10 +13,10 @@ const CreateExpense = () => {
 
   // Some prefilled form state
   const [form, setForm] = useState({
+    title: "New Online Course",
     amount: "640",
     category: "Education",
     mode: "Credit Card",
-    title: "Online Course",
     createdAt: new Date()
   });
 
@@ -45,24 +46,32 @@ const CreateExpense = () => {
   // an Authorization Header with the request
   const headers = { Authorization: `Bearer ${user._accessToken}` };
 
-  const onSubmit = async (event) => {
-    event.preventDefault();
-    const { amount, category, mode, title } = form;
-    if (amount.length === 0 || category.length === 0 || mode.length === 0 || title.length === 0) {
-      return;
+  // Normally, we would've created an onSubmit function to make the GraphQL
+  // request. But with react-query, we can simply replace that with a
+  // useMutation wrapper, which in-return will provide us some good helper 
+  // functions and state to standardize the behavior of our component.
+  const mutation = useAuthedMutation(async () => request(
+    GRAPHQL_ENDPOINT,
+    createExpenseQuery,
+    queryVariables,
+    headers
+  ), {
+    onSuccess: () => {
+      navigate(`/`)
     }
-    try {
-      await request(GRAPHQL_ENDPOINT, createExpenseQuery, queryVariables, headers);
+  });
 
-      // Navigate to the Home page after creating an expense
-      navigate(`/`);
-    } catch (error) {
-      alert(error)
-    }
-  };
-
+  // useMutation provides a mutate method which can be used
+  // to trigger the request. Also, we will disable the submit
+  // button till the time mutation is in the loading state.
   return <PageContainer>
-    <ExpenseForm onSubmit={onSubmit} form={form} setForm={setForm} title="Create Expense" />
+    <ExpenseForm
+      title="Create Expense"
+      form={form}
+      setForm={setForm}
+      onSubmit={mutation.mutate}
+      disabled={mutation.isLoading}
+    />
   </PageContainer>
 }
 

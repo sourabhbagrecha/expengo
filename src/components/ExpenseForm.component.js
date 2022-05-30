@@ -2,7 +2,7 @@ import { Button, TextField } from "@mui/material";
 import CustomDatePicker from "./CustomDatePicker.component";
 import PageContainer from "./PageContainer.component";
 
-const ExpenseForm = ({ onSubmit, form, setForm, editing }) => {
+const ExpenseForm = ({ onSubmit, form, setForm, editing, disabled }) => {
   const onFormInputChange = (event) => {
     const { name, value } = event.target;
     setForm({ ...form, [name]: value });
@@ -53,7 +53,7 @@ const ExpenseForm = ({ onSubmit, form, setForm, editing }) => {
         onChange={(v) => { setForm({ ...form, createdAt: v }) }}
         style={{ marginBottom: "1rem", display: "block" }}
       />
-      <Button variant="contained" color="primary" onClick={onSubmit} type="submit">
+      <Button variant="contained" color="primary" onClick={onSubmit} disabled={disabled}>
         {editing ? "Update" : "Create"} Expense
       </Button>
     </form>
