@@ -5,7 +5,9 @@ import { gql, request } from "graphql-request";
 import { GRAPHQL_ENDPOINT } from "../realm/constants";
 import ExpenseForm from "../components/ExpenseForm.component";
 import { useParams, useNavigate } from "react-router-dom";
-import { useMutation, useQuery } from "react-query";
+import { useQuery } from "react-query";
+import useAuthedMutation from "../hooks/useAuthedMutation";
+import useAuthedQuery from "../hooks/useAuthedQuery";
 
 const EditExpense = () => {
   const { user } = useContext(UserContext);
@@ -49,7 +51,7 @@ const EditExpense = () => {
 
   // Wraping our fetchExpense function with useQuery and 
   // updating the state of the form once it's successful.
-  const { isLoading, error } = useQuery("fetchExpense", fetchExpense, {
+  const { isLoading, error } = useAuthedQuery("fetchExpense", fetchExpense, {
     onSuccess: (data) => {
       const { title, mode, amount, category, createdAt } = data.expense;
       setForm({
@@ -89,7 +91,7 @@ const EditExpense = () => {
   // Replacing our default onSumbit function with useMutation
   // wrapped function, so that we can utilize the helper
   // states and functions provided by react-query.
-  const mutation = useMutation(() => request(
+  const mutation = useAuthedMutation(() => request(
     GRAPHQL_ENDPOINT,
     editExpenseMutation,
     queryAndUpdateVariables,

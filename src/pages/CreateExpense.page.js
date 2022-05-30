@@ -5,7 +5,7 @@ import { gql, request } from "graphql-request";
 import { GRAPHQL_ENDPOINT } from "../realm/constants";
 import ExpenseForm from "../components/ExpenseForm.component";
 import { useNavigate } from "react-router-dom";
-import { useMutation } from "react-query";
+import useAuthedMutation from "../hooks/useAuthedMutation";
 
 const CreateExpense = () => {
   const { user } = useContext(UserContext);
@@ -50,7 +50,7 @@ const CreateExpense = () => {
   // request. But with react-query, we can simply replace that with a
   // useMutation wrapper, which in-return will provide us some good helper 
   // functions and state to standardize the behavior of our component.
-  const mutation = useMutation(async () => request(
+  const mutation = useAuthedMutation(async () => request(
     GRAPHQL_ENDPOINT,
     createExpenseQuery,
     queryVariables,

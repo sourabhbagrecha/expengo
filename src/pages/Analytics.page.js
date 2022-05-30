@@ -9,6 +9,7 @@ import CustomDatePicker from "../components/CustomDatePicker.component";
 import ModeAnalytics from "../components/ModeAnalytics.component";
 import CategoryAnalytics from "../components/CategoryAnalytics.component";
 import { useQuery } from "react-query";
+import useAuthedQuery from "../hooks/useAuthedQuery";
 
 const Analytics = () => {
   // By default we would like to fetch the analytics for the last 1 month.
@@ -55,7 +56,7 @@ const Analytics = () => {
   // Again, we are replacing useEffect and useState with useQuery.
   // The data is already managed by the useQuery hook and we will just display 
   // component when it's fetched, until then we will display a loading indicator.
-  const { data, error, isLoading, refetch } = useQuery("analytics", loadAnalytics);
+  const { data, error, isLoading, refetch } = useAuthedQuery("analytics", loadAnalytics);
 
   if (isLoading) return "Loading Analytics Data";
 

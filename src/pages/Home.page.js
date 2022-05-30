@@ -4,7 +4,7 @@ import PageContainer from "../components/PageContainer.component";
 import { UserContext } from '../contexts/user.context';
 import { GRAPHQL_ENDPOINT } from '../realm/constants';
 import ExpenseCard from '../components/ExpenseCard.component';
-import { useQuery } from 'react-query';
+import useAuthedQuery from '../hooks/useAuthedQuery';
 
 const Home = () => {
   // Fetching user details from UserContext
@@ -43,7 +43,7 @@ const Home = () => {
   // Now, instead of using useEffect, we are using useQuery.
   // Also, we don't need to manage state separately. The data
   // is already managed by the useQuery hook.
-  const { isLoading, error, data, refetch } = useQuery("allExpenses", loadExpenses);
+  const { isLoading, error, data, refetch } = useAuthedQuery("allExpenses", loadExpenses);
 
   // Helper function to be performed whenever an expense gets deleted.
   // Here, instead of calling the loadExpenses function, we are calling
