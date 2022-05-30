@@ -8,7 +8,6 @@ import PageContainer from "../components/PageContainer.component";
 import CustomDatePicker from "../components/CustomDatePicker.component";
 import ModeAnalytics from "../components/ModeAnalytics.component";
 import CategoryAnalytics from "../components/CategoryAnalytics.component";
-import { useQuery } from "react-query";
 import useAuthedQuery from "../hooks/useAuthedQuery";
 
 const Analytics = () => {

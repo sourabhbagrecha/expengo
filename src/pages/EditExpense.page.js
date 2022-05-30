@@ -5,7 +5,6 @@ import { gql, request } from "graphql-request";
 import { GRAPHQL_ENDPOINT } from "../realm/constants";
 import ExpenseForm from "../components/ExpenseForm.component";
 import { useParams, useNavigate } from "react-router-dom";
-import { useQuery } from "react-query";
 import useAuthedMutation from "../hooks/useAuthedMutation";
 import useAuthedQuery from "../hooks/useAuthedQuery";
 
